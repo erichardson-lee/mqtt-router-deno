@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "rootDir": "./src",
+    "emitDeclarationOnly": true,
+    "declaration": true,
+    "outDir": "./dist/types"
+  },
+  "include": [
+    "./src/**/*"
+  ]
+}
