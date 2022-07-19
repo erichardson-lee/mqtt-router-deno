@@ -1,2 +1,2 @@
-export * from './mqttRouter';
+export * from './mqttRouterCore';
 export * from './pathParameterInference';

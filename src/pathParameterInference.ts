@@ -101,3 +101,19 @@ should be:
 }
 */
 type TestParameters4 = MqttParameters<"abc/test/values/#bar">;
+
+
+export type MQTTRouteMap = {
+  [route: string]: unknown;
+}
+
+export type SpecificRoutes<Routes extends MQTTRouteMap> = Exclude<keyof Routes,
+  | `${string}/+${string}`
+  | `${string}/#${string}`
+  | `${string}/+`
+  | `${string}/#`
+  | `+${string}`
+  | `#${string}`
+>
+
+export type ParameterRoutes<Routes extends MQTTRouteMap> = Exclude<keyof Routes, SpecificRoutes<Routes>>

@@ -1,5 +1,6 @@
 {
   "name": "@erichardson-lee/mqtt-router",
+  "version": "0.1.0",
   "packageManager": "yarn@3.1.1",
   "types": "./dist/types/index.d.ts",
   "exports": {
@@ -11,7 +12,7 @@
     "package.json"
   ],
   "scripts": {
-    "build": "yarn build:cjs & yarn build:esm & yarn build:types & echo \"Building Project\"",
+    "build": "rimraf dist && yarn build:cjs & yarn build:esm & yarn build:types & echo \"Building Project\"",
     "build:cjs": "tsc -p tsconfig.cjs.json",
     "build:esm": "tsc -p tsconfig.esm.json",
     "build:types": "tsc -p tsconfig.types.json",
@@ -21,6 +22,7 @@
     "@tsconfig/esm": "^1.0.1",
     "@tsconfig/node16": "^1.0.3",
     "@types/mqtt": "^2.5.0",
+    "rimraf": "^3.0.2",
     "typescript": "^4.7.4"
   },
   "dependencies": {
