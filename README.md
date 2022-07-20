@@ -80,26 +80,26 @@ This strong typing also works for publishing, and the publish function also
 prevents you from accidentally publishing to a topic with parameters in it.
 
 ```ts
-import { MqttRouter } from '@erichardson-lee/mqtt-router'
+import { MqttRouter } from "@erichardson-lee/mqtt-router";
 
 type PubRoutes = {
-  "sensors/1/temperature": number,
+  "sensors/1/temperature": number;
 };
 
 type SubRoutes = {
-  "sensors/+id/temperature": number,
-  "sensors/+id/humidity": number
+  "sensors/+id/temperature": number;
+  "sensors/+id/humidity": number;
 };
 
 type Routes = PubRoutes & SubRoutes;
 
-const router = new MqttRouter<Routes>({ hostname: 'localhost', port: 1883 });
+const router = new MqttRouter<Routes>({ hostname: "localhost", port: 1883 });
 
-router.addJSONRoute('sensors/+id/temperature', (msg) => {
+router.addJSONRoute("sensors/+id/temperature", (msg) => {
   console.log(msg.params.id);
 
   console.log(msg.body);
 });
 
-router.publish('sensors/1/temperature', 40.2);
+router.publish("sensors/1/temperature", 40.2);
 ```

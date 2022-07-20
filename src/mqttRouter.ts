@@ -1,13 +1,22 @@
-export type { MqttParameters } from './pathParameterInference';
-import { exec, clean } from './mqtt-pattern';
-import { MqttParameters, MQTTRouteMap, SpecificRoutes } from './pathParameterInference';
+export type { MqttParameters } from "./pathParameterInference";
+import { exec, clean } from "./mqtt-pattern";
+import {
+  MqttParameters,
+  MQTTRouteMap,
+  SpecificRoutes,
+} from "./pathParameterInference";
 
-import { connect, IClientOptions, IClientPublishOptions, MqttClient } from 'mqtt';
+import {
+  connect,
+  IClientOptions,
+  IClientPublishOptions,
+  MqttClient,
+} from "mqtt";
 
 export interface MQTTMessage<Params, Body = string> {
-  topic: string,
-  params: Params,
-  body: Body,
+  topic: string;
+  params: Params;
+  body: Body;
 }
 
 interface RouteDeclaration<Path = string> {
@@ -15,9 +24,11 @@ interface RouteDeclaration<Path = string> {
   callback: RouterCallback<Path>;
 }
 
-export type OnNewRouteCallback = (path: string) => void
+export type OnNewRouteCallback = (path: string) => void;
 
-export type RouterCallback<Path, Body = string> = (msg: MQTTMessage<MqttParameters<Path>, Body>) => void
+export type RouterCallback<Path, Body = string> = (
+  msg: MQTTMessage<MqttParameters<Path>, Body>
+) => void;
 
 export class MqttRouter<Routes extends MQTTRouteMap = MQTTRouteMap> {
   private routes: RouteDeclaration<any>[] = [];
@@ -27,7 +38,7 @@ export class MqttRouter<Routes extends MQTTRouteMap = MQTTRouteMap> {
   constructor(options: IClientOptions);
   constructor(client: MqttClient);
   constructor(arg: MqttClient | IClientOptions) {
-    this.mqttClient = (arg instanceof MqttClient ? arg : connect(arg));
+    this.mqttClient = arg instanceof MqttClient ? arg : connect(arg);
 
     this.mqttClient.on("message", (topic, payload) => {
       this.emit(topic, payload.toString());
@@ -39,52 +50,55 @@ export class MqttRouter<Routes extends MQTTRouteMap = MQTTRouteMap> {
       const res = exec(route.path, topic.toString());
 
       // Doesn't match
-      if (!res) return
+      if (!res) return;
 
       void route.callback({
         topic: topic.toString(),
         body,
         params: res,
-      })
-    })
+      });
+    });
   }
 
-  public addRoute<Path extends keyof Routes>(path: Path, callback: RouterCallback<Path>) {
+  public addRoute<Path extends keyof Routes>(
+    path: Path,
+    callback: RouterCallback<Path>
+  ) {
     this.routes.push({
       path,
-      callback
+      callback,
     });
 
     return this.mqttClient.subscribe(clean(path.toString()));
   }
 
-  public addJSONRoute<Path extends keyof Routes, Body extends Routes[Path] = Routes[Path]>(path: Path, callback: RouterCallback<Path, Body>) {
-    return this.addRoute(path, (msg) => callback({
-      topic: msg.topic,
-      params: msg.params,
-      body: <Body>JSON.parse(msg.body)
-    }));
+  public addJSONRoute<
+    Path extends keyof Routes,
+    Body extends Routes[Path] = Routes[Path]
+  >(path: Path, callback: RouterCallback<Path, Body>) {
+    return this.addRoute(path, (msg) =>
+      callback({
+        topic: msg.topic,
+        params: msg.params,
+        body: <Body>JSON.parse(msg.body),
+      })
+    );
   }
 
   public async publish<
     Topic extends SpecificRoutes<Routes>,
-    Body extends Routes[Topic] = Routes[Topic],
-    >(
-      topic: Topic,
-      value: Body,
-      options?: IClientPublishOptions,
-  ): Promise<void> {
+    Body extends Routes[Topic] = Routes[Topic]
+  >(topic: Topic, value: Body, options?: IClientPublishOptions): Promise<void> {
     const stringValue =
-      typeof value === 'string' ? value : JSON.stringify(value)
+      typeof value === "string" ? value : JSON.stringify(value);
 
     return new Promise((res, rej) => {
       this.mqttClient.publish(
         topic.toString(),
         stringValue,
         options ?? {},
-        (err) => err ? rej(err) : res()
+        (err) => (err ? rej(err) : res())
       );
     });
   }
 }
-
