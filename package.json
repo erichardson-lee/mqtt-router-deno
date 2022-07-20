@@ -22,15 +22,11 @@
     "test": "ava"
   },
   "peerDependencies": {
-    "@types/node": "*",
     "mqtt": "*"
   },
   "peerDependenciesMeta": {
-    "@types/node": {
-      "optional": true
-    },
     "mqtt": {
-      "optional": true
+      "optional": false
     }
   },
   "dependencies": {

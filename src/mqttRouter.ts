@@ -1,7 +1,8 @@
 export type { MqttParameters } from './pathParameterInference';
-
 import { exec } from './mqtt-pattern';
 import { MqttParameters, MQTTRouteMap, SpecificRoutes } from './pathParameterInference';
+
+import { connect, IClientOptions, IClientPublishOptions, MqttClient } from 'mqtt';
 
 export interface MQTTMessage<Params, Body = string> {
   topic: string,
@@ -18,20 +19,20 @@ export type OnNewRouteCallback = (path: string) => void
 
 export type RouterCallback<Path, Body = string> = (msg: MQTTMessage<MqttParameters<Path>, Body>) => void
 
-export interface MqttClient {
-  subscribe(topic: string): void;
-  publish(topic: string, message: string): void;
-}
-
-export const MockMqttClient: MqttClient = {
-  subscribe: (topic) => void (`Subscribe to ${topic}`),
-  publish: (topic, value) => void (`Publish to ${topic}: ${value}`),
-}
-
-export class MqttRouterCore<Routes extends MQTTRouteMap = MQTTRouteMap, Client extends MqttClient = MqttClient> {
+export class MqttRouter<Routes extends MQTTRouteMap = MQTTRouteMap> {
   private routes: RouteDeclaration<any>[] = [];
 
-  constructor(protected readonly mqttClient: Client) { }
+  public readonly mqttClient: MqttClient;
+
+  constructor(options: IClientOptions);
+  constructor(client: MqttClient);
+  constructor(arg: MqttClient | IClientOptions) {
+    this.mqttClient = (arg instanceof MqttClient ? arg : connect(arg));
+
+    this.mqttClient.on("message", (topic, payload) => {
+      this.emit(topic, payload.toString());
+    });
+  }
 
   protected emit(topic: string, body: string) {
     this.routes.forEach((route) => {
@@ -65,18 +66,25 @@ export class MqttRouterCore<Routes extends MQTTRouteMap = MQTTRouteMap, Client e
     }));
   }
 
-  public publish<
+  public async publish<
     Topic extends SpecificRoutes<Routes>,
-    Body extends Routes[Topic] = Routes[Topic]
-  >(topic: Topic, value: Body) {
+    Body extends Routes[Topic] = Routes[Topic],
+    >(
+      topic: Topic,
+      value: Body,
+      options?: IClientPublishOptions,
+  ): Promise<void> {
     const stringValue =
       typeof value === 'string' ? value : JSON.stringify(value)
 
-    return this.mqttClient.publish(
-      topic.toString(),
-      stringValue
-    );
+    return new Promise((res, rej) => {
+      this.mqttClient.publish(
+        topic.toString(),
+        stringValue,
+        options ?? {},
+        (err) => err ? rej(err) : res()
+      );
+    });
   }
 }
-
 

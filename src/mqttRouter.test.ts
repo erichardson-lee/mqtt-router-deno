@@ -1,4 +1,4 @@
-import { MqttRouterCore } from './mqttRouterCore';
+import { MqttRouterCore } from './mqttRouter';
 import test from 'ava';
 
 test('can be constructed', (t) => {
