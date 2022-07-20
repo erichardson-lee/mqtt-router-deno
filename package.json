@@ -1,7 +1,7 @@
 {
   "name": "@erichardson-lee/mqtt-router",
-  "description": "A small, typescript MQTT routing library",
-  "version": "0.1.1",
+  "description": "A MQTT router library made in typescript with support for route parameter inference, and strongly typeable routes.",
+  "version": "0.1.2",
   "private": false,
   "packageManager": "yarn@3.1.1",
   "types": "./dist/types/index.d.ts",
