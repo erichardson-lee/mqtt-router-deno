@@ -21,6 +21,7 @@ __metadata:
     "@tsconfig/esm": ^1.0.1
     "@tsconfig/node16": ^1.0.3
     "@types/mqtt": ^2.5.0
+    "@types/node": ^18.0.6
     ava: ^4.3.1
     mqtt: ^4.3.7
     mqtt-pattern: ^1.2.0
@@ -28,7 +29,13 @@ __metadata:
     ts-node: ^10.9.1
     typescript: ^4.7.4
   peerDependencies:
+    "@types/node": "*"
     mqtt: "*"
+  peerDependenciesMeta:
+    "@types/node":
+      optional: true
+    mqtt:
+      optional: true
   languageName: unknown
   linkType: soft
 
@@ -158,6 +165,13 @@ __metadata:
   dependencies:
     mqtt: "*"
   checksum: e1c21c0e88019629eab09855523e8c43bd13ddf38e82fe6f76abe4f7caf6c4dad3ca81e0ed71f2d084888d84a0d55fe4c8a29f931bf7dd9c625d0f08ced42185
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^18.0.6":
+  version: 18.0.6
+  resolution: "@types/node@npm:18.0.6"
+  checksum: 780f8885a6b6eb12f4c0246617747fdc37a451931b3c01ce8148d356c0903b705dcb16cc6a914de63d48b0dc1b002c7a3dfae681f580e1761aa551d3cd996813
   languageName: node
   linkType: hard
 

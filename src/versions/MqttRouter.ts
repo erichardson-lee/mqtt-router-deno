@@ -1,7 +1,8 @@
 import { MqttRouterCore } from "../mqttRouterCore";
 import { MQTTRouteMap } from "../pathParameterInference";
 
-import { connect, IClientOptions, MqttClient } from "mqtt";
+import * as mqtt from "mqtt";
+import type { IClientOptions, MqttClient } from "mqtt";
 
 export class MqttRouter<Routes extends MQTTRouteMap> extends MqttRouterCore<
   Routes,
@@ -10,14 +11,14 @@ export class MqttRouter<Routes extends MQTTRouteMap> extends MqttRouterCore<
   constructor(options: IClientOptions);
   constructor(client: MqttClient);
   constructor(arg: MqttClient | IClientOptions) {
-    super(arg instanceof MqttClient ? arg : connect(arg));
+    super(arg instanceof mqtt.MqttClient ? arg : mqtt.connect(arg));
 
-    this.client.on("message", (topic, payload) => {
+    this.mqttClient.on("message", (topic, payload) => {
       this.emit(topic, payload.toString());
     });
   }
 
-  public get client() {
+  public getClient() {
     return this.mqttClient;
   }
 }
