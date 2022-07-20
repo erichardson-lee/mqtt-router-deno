@@ -1,0 +1,8 @@
+yarn.lock
+dist/
+.yarn/
+node-modules/
+.editorconfig
+.gitignore
+.prettierignore
+LICENSE
