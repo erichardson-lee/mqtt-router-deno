@@ -1,5 +1,5 @@
 export type { MqttParameters } from './pathParameterInference';
-import { exec } from './mqtt-pattern';
+import { exec, clean } from './mqtt-pattern';
 import { MqttParameters, MQTTRouteMap, SpecificRoutes } from './pathParameterInference';
 
 import { connect, IClientOptions, IClientPublishOptions, MqttClient } from 'mqtt';
@@ -55,7 +55,7 @@ export class MqttRouter<Routes extends MQTTRouteMap = MQTTRouteMap> {
       callback
     });
 
-    return this.mqttClient.subscribe(path.toString());
+    return this.mqttClient.subscribe(clean(path.toString()));
   }
 
   public addJSONRoute<Path extends keyof Routes, Body extends Routes[Path] = Routes[Path]>(path: Path, callback: RouterCallback<Path, Body>) {
