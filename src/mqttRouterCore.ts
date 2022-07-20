@@ -28,10 +28,10 @@ export const MockMqttClient: MqttClient = {
   publish: (topic, value) => void (`Publish to ${topic}: ${value}`),
 }
 
-export class MqttRouterCore<Routes extends MQTTRouteMap = MQTTRouteMap> {
+export class MqttRouterCore<Routes extends MQTTRouteMap = MQTTRouteMap, Client extends MqttClient = MqttClient> {
   private routes: RouteDeclaration<any>[] = [];
 
-  constructor(private readonly mqttClient: MqttClient = MockMqttClient) { }
+  constructor(private readonly mqttClient: Client) { }
 
   private emit(topic: SpecificRoutes<Routes>, body: string) {
     this.routes.forEach((route) => {
@@ -54,11 +54,11 @@ export class MqttRouterCore<Routes extends MQTTRouteMap = MQTTRouteMap> {
       callback
     });
 
-    this.mqttClient.subscribe(path.toString());
+    return this.mqttClient.subscribe(path.toString());
   }
 
   public addJSONRoute<Path extends keyof Routes, Body extends Routes[Path] = Routes[Path]>(path: Path, callback: RouterCallback<Path, Body>) {
-    this.addRoute(path, (msg) => callback({
+    return this.addRoute(path, (msg) => callback({
       topic: msg.topic,
       params: msg.params,
       body: <Body>JSON.parse(msg.body)
@@ -68,19 +68,14 @@ export class MqttRouterCore<Routes extends MQTTRouteMap = MQTTRouteMap> {
   public publish<
     Topic extends SpecificRoutes<Routes>,
     Body extends Routes[Topic] = Routes[Topic]
-  >(topic: Topic, value: Body): void {
+  >(topic: Topic, value: Body) {
     const stringValue =
       typeof value === 'string' ? value : JSON.stringify(value)
 
-    this.mqttClient.publish(
+    return this.mqttClient.publish(
       topic.toString(),
       stringValue
     );
-
-    this.emit(
-      topic,
-      stringValue
-    )
   }
 }
 
