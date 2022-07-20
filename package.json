@@ -1,8 +1,19 @@
 {
   "name": "@erichardson-lee/mqtt-router",
-  "version": "0.1.0",
+  "description": "A small, typescript MQTT routing library",
+  "version": "0.1.1",
+  "private": false,
   "packageManager": "yarn@3.1.1",
   "types": "./dist/types/index.d.ts",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/erichardson-lee/mqtt-router"
+  },
+  "author": {
+    "name": "Edward Richardson-Lee",
+    "url": "https://github.com/erichardson-lee"
+  },
   "exports": {
     ".": {
       "require": "./dist/cjs/index.js"
@@ -19,7 +30,8 @@
     "build": "rimraf dist && yarn build:cjs & yarn build:types & echo \"Building Project\"",
     "build:cjs": "tsc -p tsconfig.cjs.json",
     "build:types": "tsc -p tsconfig.types.json",
-    "test": "ava"
+    "test": "ava",
+    "publish": ""
   },
   "peerDependencies": {
     "mqtt": "*"
