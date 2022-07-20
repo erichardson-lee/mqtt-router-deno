@@ -31,9 +31,9 @@ export const MockMqttClient: MqttClient = {
 export class MqttRouterCore<Routes extends MQTTRouteMap = MQTTRouteMap, Client extends MqttClient = MqttClient> {
   private routes: RouteDeclaration<any>[] = [];
 
-  constructor(private readonly mqttClient: Client) { }
+  constructor(protected readonly mqttClient: Client) { }
 
-  private emit(topic: SpecificRoutes<Routes>, body: string) {
+  protected emit(topic: string, body: string) {
     this.routes.forEach((route) => {
       const res = exec(route.path, topic.toString());
 
