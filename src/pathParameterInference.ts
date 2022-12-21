@@ -1,7 +1,5 @@
-import {
-  Equal,
-  IsTrue,
-} from "https://raw.githubusercontent.com/type-challenges/type-challenges/f74a4715a06f04e1e3b79bfb0403dcc2a330bc0c/utils/index.d.ts";
+import { IsExact } from "https://deno.land/x/conditional_type_checks@1.0.6/mod.ts";
+
 /**
  * This code is heavily inspired by:
  * https://lihautan.com/extract-parameters-type-from-string-literal-types-with-typescript/#splitting-a-string-literal-type
@@ -17,9 +15,9 @@ type IsParameter<Parameter> = Parameter extends `+${infer ParamName}`
   : never;
 
 type Test1 = [
-  IsTrue<Equal<"test", IsParameter<"+test">>>,
-  IsTrue<Equal<"#test", IsParameter<"#test">>>,
-  IsTrue<Equal<never, IsParameter<"test">>>
+  IsExact<"test", IsParameter<"+test">>,
+  IsExact<"#test", IsParameter<"#test">>,
+  IsExact<never, IsParameter<"test">>
 ];
 
 /**
@@ -30,9 +28,9 @@ type FilteredPathSplit<Path> = Path extends `${infer PartA}/${infer PartB}`
   : IsParameter<Path>;
 
 type Test2 = [
-  IsTrue<Equal<never, FilteredPathSplit<"A/b/c/d">>>,
+  IsExact<never, FilteredPathSplit<"A/b/c/d">>,
 
-  IsTrue<Equal<"A" | "c" | "#d", FilteredPathSplit<"+A/b/+c/#d">>>
+  IsExact<"A" | "c" | "#d", FilteredPathSplit<"+A/b/+c/#d">>
 ];
 
 /**
@@ -44,8 +42,8 @@ type ParameterValue<Parameter> = Parameter extends `#${string}`
 
 // Should be string[]
 type Test3 = [
-  IsTrue<Equal<string[], ParameterValue<"#test">>>,
-  IsTrue<Equal<string, ParameterValue<"test">>>
+  IsExact<string[], ParameterValue<"#test">>,
+  IsExact<string, ParameterValue<"test">>
 ];
 
 /**
@@ -57,8 +55,8 @@ type StripParameterHash<Parameter> = Parameter extends `#${infer Name}`
 
 // Should be "test"
 type Test4 = [
-  IsTrue<Equal<"test", StripParameterHash<"#test">>>,
-  IsTrue<Equal<"test", StripParameterHash<"#test">>>
+  IsExact<"test", StripParameterHash<"#test">>,
+  IsExact<"test", StripParameterHash<"#test">>
 ];
 
 /**
@@ -69,19 +67,17 @@ export type MqttParameters<Path> = {
 };
 
 type Test5 = [
-  IsTrue<
-    Equal<
-      {
-        test: string;
-        foo: string;
-        bar: string[];
-      },
-      MqttParameters<"abc/+test/values/+foo/#bar">
-    >
+  IsExact<
+    {
+      test: string;
+      foo: string;
+      bar: string[];
+    },
+    MqttParameters<"abc/+test/values/+foo/#bar">
   >,
-  IsTrue<Equal<{}, MqttParameters<"abc/test/values">>>,
-  IsTrue<Equal<{ test: string }, MqttParameters<"abc/+test/values">>>,
-  IsTrue<Equal<{ bar: string[] }, MqttParameters<"abc/test/values/#bar">>>
+  IsExact<{}, MqttParameters<"abc/test/values">>,
+  IsExact<{ test: string }, MqttParameters<"abc/+test/values">>,
+  IsExact<{ bar: string[] }, MqttParameters<"abc/test/values/#bar">>
 ];
 
 export type MQTTRouteMap = {
