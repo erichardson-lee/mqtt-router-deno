@@ -8,8 +8,7 @@
  */
 type IsParameter<Parameter> = Parameter extends `+${infer ParamName}`
   ? ParamName
-  : never | Parameter extends `#${string}`
-  ? Parameter
+  : never | Parameter extends `#${string}` ? Parameter
   : never;
 
 // Should be "test"
@@ -37,8 +36,7 @@ type TestSplit2 = FilteredPathSplit<"+A/b/+c/#d">;
 /**
  * Type to get Parameter Value
  */
-type ParameterValue<Parameter> = Parameter extends `#${string}`
-  ? string[]
+type ParameterValue<Parameter> = Parameter extends `#${string}` ? string[]
   : string;
 
 // Should be string[]
@@ -50,8 +48,7 @@ type TestValue2 = ParameterValue<"test">;
 /**
  * Type to remove # prefix from parameter
  */
-type StripParameterHash<Parameter> = Parameter extends `#${infer Name}`
-  ? Name
+type StripParameterHash<Parameter> = Parameter extends `#${infer Name}` ? Name
   : Parameter;
 
 // Should be "test"
@@ -64,7 +61,9 @@ type TestStrip2 = StripParameterHash<"test">;
  * Parameter Type
  */
 export type MqttParameters<Path> = {
-  [key in FilteredPathSplit<Path> as StripParameterHash<key>]: ParameterValue<key>;
+  [key in FilteredPathSplit<Path> as StripParameterHash<key>]: ParameterValue<
+    key
+  >;
 };
 
 /*

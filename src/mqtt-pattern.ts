@@ -6,7 +6,7 @@ import * as MqttPattern from "mqtt-pattern";
 interface MqttPatternModule {
   exec<Pattern>(
     pattern: Pattern,
-    topic: string
+    topic: string,
   ): MqttParameters<Pattern> | null;
   matches(pattern: string, topic: string): boolean;
   extract<Pattern>(pattern: Pattern, topic: string): MqttParameters<Pattern>;

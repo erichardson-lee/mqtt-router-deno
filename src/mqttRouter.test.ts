@@ -74,19 +74,22 @@ test.skip("JSON Route Typing", (t) => {
   router.addJSONRoute("posts/+postid/update", (msg) => {
     t.assert(typeof msg.topic === "string");
     t.assert(msg.params.postid === "test");
-    t.deepEqual(msg.body, <Post>{ title: "test", contents: "test post" });
+    t.deepEqual(msg.body, <Post> { title: "test", contents: "test post" });
   });
 
-  router.publish("posts/test/update", <Post>{
-    title: "test",
-    contents: "test post",
-  });
+  router.publish(
+    "posts/test/update",
+    <Post> {
+      title: "test",
+      contents: "test post",
+    },
+  );
 
   router.addJSONRoute("users/+userId/update", (msg) => {
     t.assert(typeof msg.topic === "string");
     t.assert(msg.params.userId === "test");
-    t.deepEqual(msg.body, <User>{ age: 20, name: "Edward" });
+    t.deepEqual(msg.body, <User> { age: 20, name: "Edward" });
   });
 
-  router.publish("users/test/update", <User>{ age: 20, name: "Edward" });
+  router.publish("users/test/update", <User> { age: 20, name: "Edward" });
 });
