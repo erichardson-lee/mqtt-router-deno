@@ -1,17 +1,17 @@
-export type { MqttParameters } from "./pathParameterInference";
-import { clean, exec } from "./mqtt-pattern";
+export type { MqttParameters } from "./pathParameterInference.ts";
+import { clean, exec } from "./mqtt-pattern.ts";
 import {
   MqttParameters,
   MQTTRouteMap,
   SpecificRoutes,
-} from "./pathParameterInference";
+} from "./pathParameterInference.ts";
 
 import {
   connect,
   IClientOptions,
   IClientPublishOptions,
   MqttClient,
-} from "mqtt";
+} from "npm:mqtt";
 
 export interface MQTTMessage<Params, Body = string> {
   topic: string;
@@ -27,7 +27,7 @@ interface RouteDeclaration<Path = string> {
 export type OnNewRouteCallback = (path: string) => void;
 
 export type RouterCallback<Path, Body = string> = (
-  msg: MQTTMessage<MqttParameters<Path>, Body>,
+  msg: MQTTMessage<MqttParameters<Path>, Body>
 ) => void;
 
 export class MqttRouter<Routes extends MQTTRouteMap = MQTTRouteMap> {
@@ -62,7 +62,7 @@ export class MqttRouter<Routes extends MQTTRouteMap = MQTTRouteMap> {
 
   public addRoute<Path extends keyof Routes>(
     path: Path,
-    callback: RouterCallback<Path>,
+    callback: RouterCallback<Path>
   ) {
     this.routes.push({
       path,
@@ -74,30 +74,30 @@ export class MqttRouter<Routes extends MQTTRouteMap = MQTTRouteMap> {
 
   public addJSONRoute<
     Path extends keyof Routes,
-    Body extends Routes[Path] = Routes[Path],
+    Body extends Routes[Path] = Routes[Path]
   >(path: Path, callback: RouterCallback<Path, Body>) {
     return this.addRoute(path, (msg) =>
       callback({
         topic: msg.topic,
         params: msg.params,
-        body: <Body> JSON.parse(msg.body),
-      }));
+        body: <Body>JSON.parse(msg.body),
+      })
+    );
   }
 
-  public async publish<
+  public publish<
     Topic extends SpecificRoutes<Routes>,
-    Body extends Routes[Topic] = Routes[Topic],
+    Body extends Routes[Topic] = Routes[Topic]
   >(topic: Topic, value: Body, options?: IClientPublishOptions): Promise<void> {
-    const stringValue = typeof value === "string"
-      ? value
-      : JSON.stringify(value);
+    const stringValue =
+      typeof value === "string" ? value : JSON.stringify(value);
 
     return new Promise((res, rej) => {
       this.mqttClient.publish(
         topic.toString(),
         stringValue,
         options ?? {},
-        (err) => (err ? rej(err) : res()),
+        (err) => (err ? rej(err) : res())
       );
     });
   }

@@ -1,12 +1,12 @@
-import type { MqttParameters } from "./pathParameterInference";
+import type { MqttParameters } from "./pathParameterInference.ts";
 
 //@ts-ignore no type availble (yet)
-import * as MqttPattern from "mqtt-pattern";
+import * as MqttPattern from "npm:mqtt-pattern";
 
 interface MqttPatternModule {
   exec<Pattern>(
     pattern: Pattern,
-    topic: string,
+    topic: string
   ): MqttParameters<Pattern> | null;
   matches(pattern: string, topic: string): boolean;
   extract<Pattern>(pattern: Pattern, topic: string): MqttParameters<Pattern>;
