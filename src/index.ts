@@ -1,2 +1,2 @@
-export * from "./mqttRouter";
-export * from "./pathParameterInference";
+export * from "./mqttRouter.ts";
+export * from "./pathParameterInference.ts";

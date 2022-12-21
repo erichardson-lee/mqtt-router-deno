@@ -1,3 +1,7 @@
+import {
+  Equal,
+  IsTrue,
+} from "https://raw.githubusercontent.com/type-challenges/type-challenges/f74a4715a06f04e1e3b79bfb0403dcc2a330bc0c/utils/index.d.ts";
 /**
  * This code is heavily inspired by:
  * https://lihautan.com/extract-parameters-type-from-string-literal-types-with-typescript/#splitting-a-string-literal-type
@@ -8,108 +12,88 @@
  */
 type IsParameter<Parameter> = Parameter extends `+${infer ParamName}`
   ? ParamName
-  : never | Parameter extends `#${string}` ? Parameter
+  : never | Parameter extends `#${string}`
+  ? Parameter
   : never;
 
-// Should be "test"
-type TestParam = IsParameter<"+test">;
-
-// Should be "#test"
-type TestParam2 = IsParameter<"#test">;
-
-// Should be never
-type TestParam3 = IsParameter<"test">;
+type Test1 = [
+  IsTrue<Equal<"test", IsParameter<"+test">>>,
+  IsTrue<Equal<"#test", IsParameter<"#test">>>,
+  IsTrue<Equal<never, IsParameter<"test">>>
+];
 
 /**
- * Type To split by /
+ * Type To split by / and extract parameters
  */
 type FilteredPathSplit<Path> = Path extends `${infer PartA}/${infer PartB}`
   ? IsParameter<PartA> | FilteredPathSplit<PartB>
   : IsParameter<Path>;
 
-// Should be never
-type TestSplit = FilteredPathSplit<"A/b/c/d">;
+type Test2 = [
+  IsTrue<Equal<never, FilteredPathSplit<"A/b/c/d">>>,
 
-// Should be "A" | "c" | "#d"
-type TestSplit2 = FilteredPathSplit<"+A/b/+c/#d">;
+  IsTrue<Equal<"A" | "c" | "#d", FilteredPathSplit<"+A/b/+c/#d">>>
+];
 
 /**
  * Type to get Parameter Value
  */
-type ParameterValue<Parameter> = Parameter extends `#${string}` ? string[]
+type ParameterValue<Parameter> = Parameter extends `#${string}`
+  ? string[]
   : string;
 
 // Should be string[]
-type TestValue = ParameterValue<"#test">;
-
-// Should be string
-type TestValue2 = ParameterValue<"test">;
+type Test3 = [
+  IsTrue<Equal<string[], ParameterValue<"#test">>>,
+  IsTrue<Equal<string, ParameterValue<"test">>>
+];
 
 /**
  * Type to remove # prefix from parameter
  */
-type StripParameterHash<Parameter> = Parameter extends `#${infer Name}` ? Name
+type StripParameterHash<Parameter> = Parameter extends `#${infer Name}`
+  ? Name
   : Parameter;
 
 // Should be "test"
-type TestStrip = StripParameterHash<"#test">;
-
-// Should be "test"
-type TestStrip2 = StripParameterHash<"test">;
+type Test4 = [
+  IsTrue<Equal<"test", StripParameterHash<"#test">>>,
+  IsTrue<Equal<"test", StripParameterHash<"#test">>>
+];
 
 /**
  * Parameter Type
  */
 export type MqttParameters<Path> = {
-  [key in FilteredPathSplit<Path> as StripParameterHash<key>]: ParameterValue<
-    key
-  >;
+  [key in FilteredPathSplit<Path> as StripParameterHash<key>]: ParameterValue<key>;
 };
 
-/*
-should be:
-{
-  test: string
-  foo: string
-  bar: string[]
-}
-*/
-type TestParameters = MqttParameters<"abc/+test/values/+foo/#bar">;
-
-/*
-should be:
-{}
-*/
-type TestParameters2 = MqttParameters<"abc/test/values">;
-
-/*
-should be:
-{
-  test: string
-}
-*/
-type TestParameters3 = MqttParameters<"abc/+test/values">;
-
-/*
-should be:
-{
-  bar: string[]
-}
-*/
-type TestParameters4 = MqttParameters<"abc/test/values/#bar">;
+type Test5 = [
+  IsTrue<
+    Equal<
+      {
+        test: string;
+        foo: string;
+        bar: string[];
+      },
+      MqttParameters<"abc/+test/values/+foo/#bar">
+    >
+  >,
+  IsTrue<Equal<{}, MqttParameters<"abc/test/values">>>,
+  IsTrue<Equal<{ test: string }, MqttParameters<"abc/+test/values">>>,
+  IsTrue<Equal<{ bar: string[] }, MqttParameters<"abc/test/values/#bar">>>
+];
 
 export type MQTTRouteMap = {
   [route: string]: unknown;
 };
 
+type PD = "+" | "#";
 export type SpecificRoutes<Routes extends MQTTRouteMap> = Exclude<
   keyof Routes,
-  | `${string}/+${string}`
-  | `${string}/#${string}`
-  | `${string}/+`
-  | `${string}/#`
-  | `+${string}`
-  | `#${string}`
+  | `${string}/${PD}${string}` // Middle bit is +/#
+  | `${string}/${PD}` // Ends with +/#
+  | `${PD}${string}` // Starts with +/#
 >;
 
 export type ParameterRoutes<Routes extends MQTTRouteMap> = Exclude<
