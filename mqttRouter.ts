@@ -3,8 +3,8 @@ import { clean, exec } from "https://deno.land/x/mqtt_pattern@1.0.0/mod.ts";
 import {
   Client as MqttClient,
   ClientOptions as IClientOptions,
-} from "https://deno.land/x/mqtt@0.1.2/deno/mod.ts";
-import { PublishOptions } from "https://deno.land/x/mqtt@0.1.2/client/base_client.ts";
+} from "https://deno.land/x/mqtt_ts@1.2.0/mod.ts";
+import type { PublishOptions } from "https://deno.land/x/mqtt_ts@1.2.0/lib/base_client.ts";
 import type { MqttParameters } from "https://deno.land/x/mqtt_pattern@1.0.0/parameters.d.ts";
 
 export class MqttRouter<Routes extends MQTTRouteMap = MQTTRouteMap> {
@@ -20,13 +20,12 @@ export class MqttRouter<Routes extends MQTTRouteMap = MQTTRouteMap> {
     this.mqttClient.on(
       "message",
       (topic: string, payload: string | Uint8Array) => {
-        const pStr =
-          typeof payload === "string"
-            ? payload
-            : new TextDecoder().decode(payload);
+        const pStr = typeof payload === "string"
+          ? payload
+          : new TextDecoder().decode(payload);
 
         this.emit(topic, pStr);
-      }
+      },
     );
   }
 
@@ -54,7 +53,7 @@ export class MqttRouter<Routes extends MQTTRouteMap = MQTTRouteMap> {
 
   public addRoute<Path extends Extract<keyof Routes, string>>(
     path: Path,
-    callback: RouterCallback<Path, string>
+    callback: RouterCallback<Path, string>,
   ) {
     this.routes.push({
       path,
@@ -67,11 +66,11 @@ export class MqttRouter<Routes extends MQTTRouteMap = MQTTRouteMap> {
 
   public addJSONRoute<
     Path extends Extract<keyof Routes, string>,
-    Body extends Routes[Path] = Routes[Path]
+    Body extends Routes[Path] = Routes[Path],
   >(path: Path, callback: RouterCallback<Path, Body>) {
     return this.addRoute(path, async (msg) => {
       try {
-        const body = <Body>JSON.parse(msg.body);
+        const body = <Body> JSON.parse(msg.body);
 
         await callback({
           ...msg,
@@ -89,15 +88,16 @@ export class MqttRouter<Routes extends MQTTRouteMap = MQTTRouteMap> {
 
   public publish<
     Topic extends SpecificRoutes<Routes>,
-    Body extends Routes[Topic] = Routes[Topic]
+    Body extends Routes[Topic] = Routes[Topic],
   >(topic: Topic, value: Body, options?: PublishOptions): Promise<void> {
-    const stringValue =
-      typeof value === "string" ? value : JSON.stringify(value);
+    const stringValue = typeof value === "string"
+      ? value
+      : JSON.stringify(value);
 
     return this.mqttClient.publish(
       topic.toString(),
       stringValue,
-      options ?? {}
+      options ?? {},
     );
   }
 }
@@ -116,7 +116,7 @@ interface RouteDeclaration<Path extends string = string, Body = string> {
 export type OnNewRouteCallback = (path: string) => void;
 
 export type RouterCallback<Path, Body = string> = (
-  msg: MQTTMessage<MqttParameters<Path>, Body>
+  msg: MQTTMessage<MqttParameters<Path>, Body>,
 ) => void | Promise<void>;
 
 export type MQTTRouteMap = {
