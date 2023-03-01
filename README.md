@@ -22,8 +22,8 @@ router.addRoute("test", (msg) => {
 await router.connect().then(() => void console.log("🚀 Connected to MQTT!"));
 ```
 
-If you already have a [MQTT Client](https://deno.land/x/mqtt_ts)
-running, it can be passed into the constructor instead of connection options.
+If you already have a [MQTT Client](https://deno.land/x/mqtt_ts) running, it can
+be passed into the constructor instead of connection options.
 
 ```ts
 import { Client } from "https://deno.land/x/mqtt_ts/deno/mod.ts";
